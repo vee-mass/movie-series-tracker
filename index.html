@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie & Series Tracker</title>
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+  <header>
+    <h1>Movie & Series Tracker</h1>
+  </header>
+
+  <main>
+    <section id="search-section">
+      <h2>Search Movies & Series</h2>
+      <form id="search-form">
+        <input type="text" id="search-input" placeholder="Search by title" required>
+        <button type="submit">Search</button>
+      </form>
+    </section>
+
+    <section id="trending-section">
+      <h2>Trending Now</h2>
+      <div id="trending-list"></div>
+    </section>
+
+    
+    <section id="watchlist-section">
+      <h2>Your Watchlist</h2>
+      <div id="watchlist-list"></div>
+    </section>
+    
+    <section id="recommendations-section">
+      <h2>Recommended for You</h2>
+      <div id="recommendations-list">
+        <!-- Recommendations cards go here -->
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Victoria Massela | WDD 330 Final Project</p>
+  </footer>
+
+  <script type="module" src="scripts/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+/* =========================
+   General Styles
+========================= */
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background-color: #1C110A;
+  color: #E4D6A7;
+}
+
+header, footer {
+  background-color: #ED2D2D;
+  color: #FFFFFF;
+  text-align: center;
+  padding: 12px 0;
+}
+
+h1, h2 {
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* =========================
+   Forms
+========================= */
+form {
+  display: flex;
+  justify-content: center;
+  margin: 12px 0;
+}
+
+input[type="text"] {
+  padding: 6px 12px;
+  border-radius: 6px 0 0 6px;
+  border: none;
+  width: 250px;
+}
+
+button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 0 6px 6px 0;
+  background-color: #50A2A7;
+  color: #1C110A;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  background-color: #E9B44C;
+}
+
+/* =========================
+   Sections
+========================= */
+main {
+  padding: 20px;
+}
+
+section {
+  margin-bottom: 30px;
+}
+
+#trending-list, #watchlist-list, #recommendations-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* =========================
+   Cards
+========================= */
+.card {
+  background-color: #1C110A; /* dark card background */
+  color: #E4D6A7; /* main text */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+  margin: 10px;
+  width: 250px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+}
+
+.card img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.card-content {
+  padding: 12px;
+}
+
+.card-content h3 {
+  margin: 5px 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.card-content p {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  color: #E9B44C;
+}
+
+/* =========================
+   Episode Controls
+========================= */
+.episode-controls {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+}
+
+.episode-controls .label {
+  margin-right: 5px;
+}
+
+.episode-controls button {
+  background-color: #ED2D2D;
+  border: none;
+  color: #FFFFFF;
+  padding: 2px 6px;
+  margin: 0 3px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.episode-controls .value {
+  width: 25px;
+  text-align: center;
+}
+
+/* =========================
+   Watchlist/Add Buttons
+========================= */
+.add-watchlist {
+  margin-top: 8px;
+  background-color: #50A2A7;
+  color: #1C110A;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.add-watchlist:hover {
+  background-color: #E9B44C;
+}
+
+/* =========================
+   Recommendations
+========================= */
+#recommendations-section {
+  margin-top: 30px;
+}
+
+#recommendations-list .card {
+  border: 2px dashed #ED2D2D; /* stand out */
+  background-color: #1C110A;
+}
+
+#recommendations-list .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 14px rgba(237,45,45,0.6);
+}
+
+/* =========================
+   Responsive Layout
+========================= */
+@media (max-width: 768px) {
+  #trending-list, #watchlist-list, #recommendations-list {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  input[type="text"] {
+    width: 60%;
+  }
+}
