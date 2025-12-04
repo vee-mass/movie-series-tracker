@@ -1,4 +1,4 @@
-const OMDB_API_KEY = "YOUR_OMDB_KEY"; 
+const OMDB_API_KEY = "fc351e2e"; 
 const OMDB_BASE_URL = "https://www.omdbapi.com/";
 
 export async function getOMDbData(title) {
