@@ -1,111 +1,76 @@
 import { getOMDbData } from "../api/omdb.js";
+import { updateProgress } from "../watchlistManager.js";
 
-/**
- * Render movie/series cards into a container
- * @param {Array} items - list of movies/series from TMDb
- * @param {HTMLElement} container - HTML element to render cards into
- * @param {Function} addHandler - function to call when "Add to Watchlist" button is clicked
- * @param {Function} [cardClickHandler] - optional function for clicking a card (e.g., recommendations)
- */
-export async function renderCards(items, container, addHandler, cardClickHandler) {
-  container.innerHTML = ''; // clear container
+export async function renderCards(items, container, addHandler) {
+  container.innerHTML = "";
 
   if (!items || items.length === 0) {
-    container.innerHTML = '<p>No items found.</p>';
+    container.innerHTML = "<p>No items found.</p>";
     return;
   }
 
   for (const item of items) {
-    const card = document.createElement('div');
-    card.classList.add('card');
-    card.dataset.id = item.id;
-    card.dataset.type = item.media_type;
+    const card = document.createElement("div");
+    card.classList.add("card");
 
-    const posterPath = item.poster_path
-      ? `https://image.tmdb.org/t/p/w300${item.poster_path}`
-      : 'https://via.placeholder.com/300x450?text=No+Image';
+    const title = item.title || item.name || "Untitled";
+    const year = item.release_date ? item.release_date.split("-")[0] 
+      : item.first_air_date ? item.first_air_date.split("-")[0] : "N/A";
+    const poster = item.poster_path ? `https://image.tmdb.org/t/p/w300${item.poster_path}` 
+      : "https://via.placeholder.com/300x450?text=No+Image";
+    const type = item.media_type || (item.first_air_date ? "series" : "movie");
 
-    const title = item.title || item.name || 'Untitled';
-    const year = item.release_date
-      ? item.release_date.split('-')[0]
-      : item.first_air_date
-      ? item.first_air_date.split('-')[0]
-      : 'N/A';
-
-    let imdbRating = 'N/A';
+    // OMDb rating
+    let imdbRating = "N/A";
     try {
       const omdbData = await getOMDbData(title);
       if (omdbData && omdbData.imdbRating) imdbRating = omdbData.imdbRating;
-    } catch (err) {
-      console.warn('OMDb fetch failed for', title);
+    } catch {}
+
+    // Progress for series
+    let seasonEpisode = "";
+    if (type === "series") {
+      const storedData = JSON.parse(localStorage.getItem("watchlist")) || [];
+      const found = storedData.find(i => i.id === item.id);
+      if (found) seasonEpisode = `S${found.currentSeason} • E${found.currentEpisode}`;
     }
 
     card.innerHTML = `
-      <img src="${posterPath}" alt="${title} poster" />
-      <div class="card-content">
-        <h3>${title} (${year})</h3>
+      <img src="${poster}" alt="${title}" class="card-poster" />
+      <div class="card-info">
+        <h3>${title}</h3>
+        <p>Year: ${year}</p>
         <p>IMDb: ${imdbRating}</p>
-        ${
-          item.media_type === 'tv'
-            ? `<div class="episode-controls">
-                 <span class="label">Season:</span>
-                 <button class="season-minus">-</button>
-                 <span class="value season">${item.currentSeason || 1}</span>
-                 <button class="season-plus">+</button>
-               </div>
-               <div class="episode-controls">
-                 <span class="label">Episode:</span>
-                 <button class="episode-minus">-</button>
-                 <span class="value episode">${item.currentEpisode || 1}</span>
-                 <button class="episode-plus">+</button>
-               </div>`
-            : ''
-        }
-        <button class="add-watchlist">Add to Watchlist</button>
+        ${type === "series" && item.number_of_seasons ? `<p>Total Seasons: ${item.number_of_seasons}</p>` : ""}
+        ${seasonEpisode ? `<p>Progress: ${seasonEpisode}</p>` : ""}
       </div>
+      <button class="add-watchlist">Add to Watchlist</button>
     `;
 
-    // Add to watchlist
-    card.querySelector('.add-watchlist').addEventListener('click', () => {
-      addHandler(item);
-    });
+    const addBtn = card.querySelector(".add-watchlist");
+    addBtn.addEventListener("click", () => addHandler(item));
 
-    // Episode/season buttons
-    if (item.media_type === 'tv') {
-      const seasonSpan = card.querySelector('.season');
-      const episodeSpan = card.querySelector('.episode');
+    // Season/Episode controls
+    if (type === "series") {
+      const progressDiv = document.createElement("div");
+      progressDiv.classList.add("card-progress");
+      progressDiv.innerHTML = `
+        <button class="dec-season">-S</button>
+        <button class="dec-episode">-E</button>
+        <span>Season: ${seasonEpisode ? seasonEpisode.split(" • ")[0].slice(1) : 1}</span>
+        <span>Episode: ${seasonEpisode ? seasonEpisode.split(" • ")[1].slice(1) : 1}</span>
+        <button class="inc-season">+S</button>
+        <button class="inc-episode">+E</button>
+      `;
+      card.querySelector(".card-info").appendChild(progressDiv);
 
-      card.querySelector('.season-plus').addEventListener('click', () => {
-        item.currentSeason = (item.currentSeason || 1) + 1;
-        seasonSpan.textContent = item.currentSeason;
-        addHandler(item);
+      progressDiv.querySelector(".inc-season").addEventListener("click", () => {
+        updateProgress(item.id, (item.currentSeason || 1) + 1, item.currentEpisode || 1);
+        renderCards(items, container, addHandler);
       });
-
-      card.querySelector('.season-minus').addEventListener('click', () => {
-        if ((item.currentSeason || 1) > 1) item.currentSeason--;
-        seasonSpan.textContent = item.currentSeason;
-        addHandler(item);
-      });
-
-      card.querySelector('.episode-plus').addEventListener('click', () => {
-        item.currentEpisode = (item.currentEpisode || 1) + 1;
-        episodeSpan.textContent = item.currentEpisode;
-        addHandler(item);
-      });
-
-      card.querySelector('.episode-minus').addEventListener('click', () => {
-        if ((item.currentEpisode || 1) > 1) item.currentEpisode--;
-        episodeSpan.textContent = item.currentEpisode;
-        addHandler(item);
-      });
-    }
-
-    // Optional card click handler for recommendations
-    if (cardClickHandler) {
-      card.addEventListener('click', (e) => {
-        // Ignore clicks on buttons inside the card
-        if (e.target.tagName.toLowerCase() === 'button') return;
-        cardClickHandler(item);
+      progressDiv.querySelector(".inc-episode").addEventListener("click", () => {
+        updateProgress(item.id, item.currentSeason || 1, (item.currentEpisode || 1) + 1);
+        renderCards(items, container, addHandler);
       });
     }
 

@@ -1,7 +1,6 @@
 import { searchTMDB, getTrending, getRecommendations } from "./api/tmdb.js";
-import { getWatchlist, addToWatchlist } from "./watchlistManager.js";
+import { getWatchlist, addToWatchlist, updateProgress } from "./watchlistManager.js";
 import { renderCards } from "./ui/renderCards.js";
-import { renderRecommendations } from "./ui/renderRecommendations.js";
 
 const searchForm = document.getElementById("search-form");
 const searchInput = document.getElementById("search-input");
@@ -10,47 +9,29 @@ const watchlistContainer = document.getElementById("watchlist-list");
 const recommendationsContainer = document.getElementById("recommendations-list");
 
 async function loadTrending() {
-  try {
-    const trending = await getTrending();
-    renderCards(trending, trendingContainer, addToWatchlistHandler);
-  } catch (error) {
-    console.error("Error fetching trending data:", error);
-  }
+  const trending = await getTrending();
+  renderCards(trending, trendingContainer, addToWatchlist);
 }
 
 function renderWatchlist() {
-  renderCards(getWatchlist(), watchlistContainer, addToWatchlistHandler);
+  const watchlist = getWatchlist();
+  renderCards(watchlist, watchlistContainer, addToWatchlist);
 }
 
 async function loadRecommendations() {
-  try {
-    const recs = await getRecommendations();
-    renderRecommendations(recs, recommendationsContainer, addToWatchlistHandler);
-  } catch (error) {
-    console.error("Error fetching recommendations:", error);
-  }
-}
-
-function addToWatchlistHandler(item) {
-  addToWatchlist(item);
-  renderWatchlist();
+  const recommendations = await getRecommendations();
+  renderCards(recommendations, recommendationsContainer, addToWatchlist);
 }
 
 searchForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const query = searchInput.value.trim();
   if (!query) return;
-
-  try {
-    const results = await searchTMDB(query);
-    renderCards(results, trendingContainer, addToWatchlistHandler);
-  } catch (error) {
-    console.error("Error fetching search results:", error);
-  }
-
+  const results = await searchTMDB(query);
+  renderCards(results, trendingContainer, addToWatchlist);
   searchForm.reset();
 });
 
 loadTrending();
-renderWatchlist();
 loadRecommendations();
+renderWatchlist();
